@@ -75,6 +75,35 @@ cd rl-align-lib
 pip install -e .
 ```
 
+### ⚡ LLM Support (Qwen, Llama, etc.)
+This library is designed to work seamlessly with `transformers`, `peft`, and `bitsandbytes`. You can train large models on consumer GPUs using LoRA and 4-bit quantization.
+
+---
+
+## 🚀 Professional LLM Training
+
+### Training Qwen-2.5 with GRPO & LoRA
+GRPO (Group Relative Policy Optimization) is the algorithm behind DeepSeek-R1. It's extremely memory efficient as it removes the need for a critic model.
+
+```python
+from rl_align.agents.online.ppo_grpo import GRPOAgent
+from peft import LoraConfig, get_peft_model
+
+# 1. Load your favorite LLM
+model = AutoModelForCausalLM.from_pretrained("Qwen/Qwen2.5-7B-Instruct")
+
+# 2. Apply LoRA for efficiency
+peft_config = LoraConfig(r=16, lora_alpha=32, target_modules=["q_proj", "v_proj"])
+model = get_peft_model(model, peft_config)
+
+# 3. Initialize GRPO Agent
+agent = GRPOAgent({"beta": 0.1, "group_size": 8}, model)
+
+# 4. Train!
+trainer = Trainer(agent, dataset, reward_model=my_reward_fn)
+trainer.train()
+```
+
 ---
 
 ## 📖 Quick Start
